@@ -84,9 +84,19 @@ jobs:
             token: ${{ secrets.TOKEN }}
 
         - name: Update tag in kubernetes deployment manifest
-          run: | 
-               sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/product-catalog:${{github.run_id}}|g" kubernetes/productcatalog/deploy.yaml && sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/product-catalog:${{github.run_id}}|" kubernetes/productcatalog/deploy.yaml
-        
+          run: |
+            IMAGE_TAG=${{ github.run_id }}
+    
+            # Update image tag
+            sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/product-catalog:$IMAGE_TAG|g" kubernetes/productcatalog/deploy.yaml
+
+            # Add or update rollout annotation with timestamp
+            if grep -q 'rollout.timestamp' kubernetes/productcatalog/deploy.yaml; then
+              sed -i "s|rollout.timestamp: .*|rollout.timestamp: \"$IMAGE_TAG\"|" kubernetes/productcatalog/deploy.yaml
+            else
+              sed -i "/metadata:/a \ \ \ \ annotations:\n\ \ \ \ \ \ rollout.timestamp: \"$IMAGE_TAG\"" kubernetes/productcatalog/deploy.yaml
+            fi
+
         - name: Commit and push changes
           run: |
             git config --global user.email "bhargav.v@arithaconsulting.com"

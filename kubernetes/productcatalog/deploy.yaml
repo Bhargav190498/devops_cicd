@@ -3,6 +3,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+    annotations:
+      rollout.timestamp: "16126402881"
   name: opentelemetry-demo-productcatalogservice
   labels:
     
@@ -21,6 +23,8 @@ spec:
       opentelemetry.io/name: opentelemetry-demo-productcatalogservice
   template:
     metadata:
+    annotations:
+      rollout.timestamp: "16126402881"
       labels:
         
         opentelemetry.io/name: opentelemetry-demo-productcatalogservice
@@ -31,7 +35,7 @@ spec:
       serviceAccountName: opentelemetry-demo
       containers:
         - name: productcatalogservice
-          image: bhargavrao19/product-catalog:16124653167
+          image: bhargavrao19/product-catalog:16126402881
           imagePullPolicy: IfNotPresent
           ports:
             
